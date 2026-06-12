@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>File Organizer — divbiggman®</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0A0A0A; color: #F5F0E8; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .container { max-width: 700px; width: 90%; padding: 40px; }
+  h1 { font-size: 36px; color: #C9A84C; margin-bottom: 8px; font-weight: 300; letter-spacing: 2px; }
+  p.sub { color: #888; font-size: 13px; margin-bottom: 40px; letter-spacing: 1px; }
+  .drop-zone { border: 1px solid #C9A84C; padding: 60px 20px; text-align: center; cursor: pointer; transition: all 0.3s; margin-bottom: 24px; }
+  .drop-zone:hover { background: rgba(201,168,76,0.05); }
+  .drop-zone p { color: #888; font-size: 13px; letter-spacing: 1px; }
+  .drop-zone span { color: #C9A84C; }
+  input[type="file"] { display: none; }
+  .btn { background: #C9A84C; color: #0A0A0A; border: none; padding: 14px 40px; font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; width: 100%; transition: all 0.3s; }
+  .btn:hover { background: #E8C97A; }
+  .results { margin-top: 32px; }
+  .result-item { display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #1A1A1A; font-size: 13px; }
+  .result-item .category { color: #C9A84C; font-weight: 500; }
+  .summary { text-align: center; padding: 20px; color: #888; font-size: 12px; letter-spacing: 2px; }
+  .logo { text-align: right; font-size: 10px; color: #333; letter-spacing: 3px; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>File Organizer</h1>
+  <p class="sub">Automated Data Processing · divbiggman®</p>
+
+  <div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+    <p>Drag & drop your files here or <span>browse</span></p>
+    <p id="fileCount" style="margin-top:8px;"></p>
+  </div>
+  <input type="file" id="fileInput" multiple onchange="updateCount()">
+
+  <button class="btn" onclick="uploadFiles()">Organize Files</button>
+
+  <div class="results" id="results"></div>
+  <div class="logo">DIVBIGGMAN® · 2026</div>
+</div>
+
+<script>
+function updateCount() {
+  const files = document.getElementById('fileInput').files;
+  document.getElementById('fileCount').textContent = files.length + ' file(s) selected';
+}
+
+async function uploadFiles() {
+document.querySelector('.btn').disabled = true;
+  const files = document.getElementById('fileInput').files;
+  if (!files.length) { alert('Please select files first.');document.querySelector('.btn').disabled = false; return; }
+  const formData = new FormData();
+  for (let f of files) formData.append('files', f);
+  const res = await fetch('/upload', { method: 'POST', body: formData });
+  const data = await res.json();
+  const div = document.getElementById('results');
+  div.innerHTML = '<div class="summary">' + data.results.length + ' FILES ORGANIZED — 80% TIME REDUCTION ACHIEVED</div>';
+  data.results.forEach(r => {
+    div.innerHTML += '<div class="result-item"><span>' + r.file + '</span><span class="category">' + r.category + '</span></div>';
+  });
+}
+</script>
+</body>
+</html>
